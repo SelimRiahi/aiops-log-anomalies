@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, roc_auc_score, confusion_matrix
 import tensorflow as tf
 import keras
@@ -39,22 +40,38 @@ X = df.drop('isFraud', axis=1)
 print(f"Features: {X.shape[1]}")
 print(f"Fraud rate: {fraud_labels.mean() * 100:.4f}%")
 
-# Train on NORMAL transactions only (unsupervised learning)
-print("\n[2/5] Selecting normal transactions for training...")
+# Split dataset into 80% train and 20% test
+print("\n[2/5] Splitting data into train (80%) and test (20%)...")
+X_train, X_test, y_train, y_test = train_test_split(
+    X, fraud_labels, 
+    test_size=0.2, 
+    random_state=42,
+    stratify=fraud_labels  # Keep same fraud ratio in both sets
+)
 
-# Use only normal transactions for training
-normal_mask = fraud_labels == 0
-X_train_normal = X[normal_mask].copy()
+print(f"Train set: {X_train.shape} - Fraud rate: {y_train.mean() * 100:.4f}%")
+print(f"Test set:  {X_test.shape} - Fraud rate: {y_test.mean() * 100:.4f}%")
 
-print(f"\nTraining set (normal only): {X_train_normal.shape}")
+# Save test set for prediction script
+test_df = X_test.copy()
+test_df['isFraud'] = y_test.values
+test_df.to_csv('paysim_test.csv', index=False)
+print("✓ Saved test set: paysim_test.csv")
+
+# Train on NORMAL transactions only from train set (unsupervised learning)
+print("\n[3/5] Selecting normal transactions from train set...")
+normal_mask = y_train == 0
+X_train_normal = X_train[normal_mask].copy()
+
+print(f"Training set (normal only): {X_train_normal.shape}")
 
 # Scale features
-print("\n[3/5] Scaling features...")
+print("\n[4/5] Scaling features...")
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train_normal)
 
-# Also scale the full dataset for evaluation
-X_full_scaled = scaler.transform(X)
+# Also scale the test set for evaluation
+X_test_scaled = scaler.transform(X_test)
 
 # Save scaler
 joblib.dump(scaler, 'autoencoder_scaler.pkl')
@@ -142,23 +159,24 @@ train_mse = np.mean(np.power(X_train_scaled - train_reconstructions, 2), axis=1)
 threshold = np.percentile(train_mse, 95)
 print(f"\nThreshold (95th percentile): {threshold:.6f}")
 
-# Evaluate on full dataset (including frauds)
-full_reconstructions = autoencoder.predict(X_full_scaled, verbose=0)
-full_mse = np.mean(np.power(X_full_scaled - full_reconstructions, 2), axis=1)
+# Evaluate on TEST set only (not full dataset)
+print("\n[5/5] Evaluating model performance on test set...")
+test_reconstructions = autoencoder.predict(X_test_scaled, verbose=0)
+test_mse = np.mean(np.power(X_test_scaled - test_reconstructions, 2), axis=1)
 
-# Predict anomalies
-predictions = (full_mse > threshold).astype(int)
+# Predict anomalies on test set
+predictions = (test_mse > threshold).astype(int)
 
 # Calculate metrics
 print("\n" + "=" * 80)
-print("PERFORMANCE METRICS")
+print("PERFORMANCE METRICS (TEST SET)")
 print("=" * 80)
 
-accuracy = accuracy_score(fraud_labels, predictions)
-precision = precision_score(fraud_labels, predictions, zero_division=0)
-recall = recall_score(fraud_labels, predictions, zero_division=0)
-f1 = f1_score(fraud_labels, predictions, zero_division=0)
-roc_auc = roc_auc_score(fraud_labels, full_mse)
+accuracy = accuracy_score(y_test, predictions)
+precision = precision_score(y_test, predictions, zero_division=0)
+recall = recall_score(y_test, predictions, zero_division=0)
+f1 = f1_score(y_test, predictions, zero_division=0)
+roc_auc = roc_auc_score(y_test, test_mse)
 
 print(f"\n✓ Accuracy:   {accuracy:.4f} ({accuracy * 100:.2f}%)")
 print(f"✓ Precision:  {precision:.4f} ({precision * 100:.2f}%)")
@@ -167,7 +185,7 @@ print(f"✓ F1-Score:   {f1:.4f} ({f1 * 100:.2f}%)")
 print(f"✓ ROC-AUC:    {roc_auc:.4f}")
 
 # Calculate confusion matrix (for visualizations only, not printed)
-cm = confusion_matrix(fraud_labels, predictions)
+cm = confusion_matrix(y_test, predictions)
 tn, fp, fn, tp = cm.ravel()
 
 # Save model and components (silently)
@@ -194,8 +212,8 @@ ax1.grid(True, alpha=0.3)
 
 # 2. Reconstruction error distribution
 ax2 = fig.add_subplot(gs[0, 1])
-ax2.hist(full_mse[fraud_labels==0], bins=50, alpha=0.6, label='Normal', color='blue', density=True)
-ax2.hist(full_mse[fraud_labels==1], bins=50, alpha=0.6, label='Fraud', color='red', density=True)
+ax2.hist(test_mse[y_test==0], bins=50, alpha=0.6, label='Normal', color='blue', density=True)
+ax2.hist(test_mse[y_test==1], bins=50, alpha=0.6, label='Fraud', color='red', density=True)
 ax2.axvline(threshold, color='green', linestyle='--', linewidth=2, label=f'Threshold: {threshold:.4f}')
 ax2.set_title('Reconstruction Error Distribution', fontsize=12, fontweight='bold')
 ax2.set_xlabel('MSE')
@@ -231,7 +249,7 @@ for bar in bars:
 
 # 5. Error by class
 ax5 = fig.add_subplot(gs[1, 1])
-ax5.boxplot([full_mse[fraud_labels==0], full_mse[fraud_labels==1]], 
+ax5.boxplot([test_mse[y_test==0], test_mse[y_test==1]], 
             labels=['Normal', 'Fraud'], patch_artist=True,
             boxprops=dict(facecolor='lightblue', alpha=0.7),
             medianprops=dict(color='red', linewidth=2))
