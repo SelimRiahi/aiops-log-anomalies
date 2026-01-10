@@ -1,0 +1,41 @@
+# Production Requirements for MLOps Fraud Detection System
+
+# Core Dependencies
+pandas>=1.5.0
+numpy>=1.23.0
+scikit-learn>=1.2.0
+tensorflow>=2.10.0
+joblib>=1.2.0
+
+# API Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+
+# Monitoring & Visualization
+streamlit>=1.28.0
+plotly>=5.17.0
+seaborn>=0.12.0
+matplotlib>=3.6.0
+
+# Data Drift Detection
+scipy>=1.10.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+httpx>=0.25.0  # For FastAPI testing
+
+# Logging
+python-json-logger>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# Optional: MLflow for experiment tracking
+# mlflow>=2.8.0
+
+# Optional: Prometheus client for metrics
+# prometheus-client>=0.18.0
