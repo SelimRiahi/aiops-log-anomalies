@@ -16,6 +16,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from api.schemas import TransactionRequest, PredictionResponse, HealthResponse, MetricsResponse
 from api.model_handler import model_handler
+from api.email_alerts import email_alerter
 from monitoring.metrics_tracker import metrics_tracker
 from config.config import MODEL_VERSION, API_HOST, API_PORT
 
@@ -123,6 +124,18 @@ async def predict_fraud(transaction: TransactionRequest, request: Request):
             response_time_ms=response_time,
             transaction_data=transaction.model_dump()
         )
+        
+        # Send email alert if fraud detected
+        if is_fraud:
+            email_alerter.send_fraud_alert(
+                transaction_data=transaction.model_dump(),
+                prediction_details={
+                    'reconstruction_error': reconstruction_error,
+                    'threshold': float(model_handler.threshold),
+                    'confidence': confidence,
+                    'fraud_probability': fraud_prob
+                }
+            )
         
         # Log prediction
         logger.info(

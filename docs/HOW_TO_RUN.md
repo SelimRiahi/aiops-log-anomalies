@@ -3,11 +3,13 @@
 ## 🚀 QUICK START
 
 ### **Option 1: One Command Start**
+
 ```powershell
 .\start.ps1
 ```
 
 This will:
+
 - ✅ Check Docker is running
 - ✅ Start API container (port 8000)
 - ✅ Start Dashboard container (port 8501)
@@ -19,9 +21,11 @@ This will:
 ## 📋 STEP-BY-STEP GUIDE
 
 ### **Step 1: Ensure Docker is Running**
+
 Open Docker Desktop and make sure it's running.
 
 ### **Step 2: Start the System**
+
 ```powershell
 # Start both API and Dashboard
 docker-compose up -d
@@ -32,6 +36,7 @@ docker-compose up -d dashboard  # Just Dashboard
 ```
 
 ### **Step 3: Verify Services**
+
 ```powershell
 # Check running containers
 docker ps
@@ -43,6 +48,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/health" -Method Get
 ### **Step 4: Access the System**
 
 **🌐 Open in Browser:**
+
 - **Dashboard**: http://localhost:8501
 - **API Docs**: http://localhost:8000/docs
 - **Metrics**: http://localhost:8000/metrics
@@ -52,18 +58,23 @@ Invoke-RestMethod -Uri "http://localhost:8000/health" -Method Get
 ## 🧪 TESTING THE SYSTEM
 
 ### **Test 1: Real User History (Best Results)**
+
 ```powershell
 .\test_real_history.ps1
 ```
+
 Uses pre-computed features from test data. Model accuracy is high!
 
 ### **Test 2: Send Multiple Transactions**
+
 ```powershell
 .\send_test_transactions.ps1
 ```
+
 Sends 10 test transactions and shows results.
 
 ### **Test 3: Manual Testing via Swagger**
+
 1. Go to http://localhost:8000/docs
 2. Find **POST /predict_test_sample**
 3. Click "Try it out"
@@ -72,9 +83,11 @@ Sends 10 test transactions and shows results.
 6. See prediction result!
 
 ### **Test 4: System Status Check**
+
 ```powershell
 .\test_system.ps1
 ```
+
 Checks health, sends test predictions, validates metrics.
 
 ---
@@ -95,6 +108,7 @@ Checks health, sends test predictions, validates metrics.
 ## 🔍 MONITORING & LOGS
 
 ### **View API Logs**
+
 ```powershell
 docker logs fraud-detection-api
 
@@ -106,11 +120,13 @@ docker logs fraud-detection-api --tail 50
 ```
 
 ### **View Dashboard Logs**
+
 ```powershell
 docker logs fraud-detection-dashboard
 ```
 
 ### **Check Metrics File**
+
 ```powershell
 Get-Content logs/metrics.jsonl | Select-Object -Last 10
 ```
@@ -120,17 +136,20 @@ Get-Content logs/metrics.jsonl | Select-Object -Last 10
 ## 🛑 STOPPING THE SYSTEM
 
 ### **Stop Everything**
+
 ```powershell
 docker-compose down
 ```
 
 ### **Stop Individual Services**
+
 ```powershell
 docker stop fraud-detection-api
 docker stop fraud-detection-dashboard
 ```
 
 ### **Restart Services**
+
 ```powershell
 docker restart fraud-detection-api
 docker restart fraud-detection-dashboard
@@ -141,12 +160,14 @@ docker restart fraud-detection-dashboard
 ## 🔧 TROUBLESHOOTING
 
 ### **Problem: Docker not running**
+
 ```powershell
 # Start Docker Desktop manually
 # Then run: .\start.ps1
 ```
 
 ### **Problem: Port already in use**
+
 ```powershell
 # Check what's using the port
 netstat -ano | findstr :8000
@@ -156,6 +177,7 @@ netstat -ano | findstr :8501
 ```
 
 ### **Problem: Dashboard shows no data**
+
 ```powershell
 # Send some test predictions first
 .\test_real_history.ps1
@@ -164,6 +186,7 @@ netstat -ano | findstr :8501
 ```
 
 ### **Problem: API returns 500 errors**
+
 ```powershell
 # Check API logs
 docker logs fraud-detection-api --tail 50
@@ -173,6 +196,7 @@ docker restart fraud-detection-api
 ```
 
 ### **Problem: Need to rebuild**
+
 ```powershell
 # Rebuild from scratch
 docker-compose down

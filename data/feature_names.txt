@@ -1,0 +1,30 @@
+FEATURE LIST
+================================================================================
+
+ 1. step
+ 2. amount
+ 3. oldbalanceOrg
+ 4. newbalanceOrig
+ 5. oldbalanceDest
+ 6. newbalanceDest
+ 7. amount_log
+ 8. amount_to_oldbalance_ratio
+ 9. amount_exceeds_balance
+10. is_high_amount
+11. is_night
+12. is_weekend
+13. hour_sin
+14. hour_cos
+15. balance_change_orig
+16. balance_change_dest
+17. expected_balance_change
+18. balance_inconsistency_orig
+19. has_zero_balances
+20. drains_account
+21. balance_mismatch
+22. is_transfer
+23. is_cashout
+24. is_risky_type
+25. dest_is_merchant
+26. is_c2c
+27. risk_score
