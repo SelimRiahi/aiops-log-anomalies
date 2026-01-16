@@ -62,6 +62,7 @@ aiops-log-anomalies/
 ## 🚀 Démarrage Rapide
 
 ### Option 1 : Docker (Recommandé)
+
 ```bash
 # Configurer les variables d'environnement
 cp .env.example .env
@@ -76,6 +77,7 @@ docker-compose up -d
 ```
 
 ### Option 2 : Local
+
 ```bash
 # Installer les dépendances
 pip install -r requirements.txt
@@ -92,14 +94,17 @@ streamlit run dashboard.py --server.port 8501
 ## 📊 Pipeline de Données
 
 1. **Nettoyage** → `scripts/1_data_preparation.py`
+
    - Source : PaySim (6.36M transactions)
    - Output : `data/paysim_reduced.csv` (49,977 trans.)
 
 2. **Feature Engineering** → `scripts/2_feature_engineering.py`
+
    - Input : paysim_reduced.csv
    - Output : `data/paysim_features.csv` (27 features)
 
 3. **Entraînement** → `scripts/3_train.py`
+
    - Modèle : Autoencoder (27→64→32→16→32→64→27)
    - Output : `models/autoencoder.keras`, threshold
 
@@ -115,22 +120,24 @@ streamlit run dashboard.py --server.port 8501
 
 ## 📈 Métriques Modèle
 
-| Métrique | Valeur |
-|----------|--------|
-| Accuracy | 93.49% |
+| Métrique        | Valeur |
+| --------------- | ------ |
+| Accuracy        | 93.49% |
 | Rappel (Fraude) | 87.10% |
-| Précision | 76.52% |
-| F1-Score | 81.47% |
-| ROC-AUC | 98.20% |
+| Précision       | 76.52% |
+| F1-Score        | 81.47% |
+| ROC-AUC         | 98.20% |
 
 ## 🔍 Présentation du Projet
 
 Pour une présentation interactive complète :
+
 ```bash
 streamlit run project_presentation.py
 ```
 
 **10 pages incluant :**
+
 - Vue d'ensemble du projet
 - Nettoyage des données
 - Feature engineering
@@ -145,6 +152,7 @@ streamlit run project_presentation.py
 ## 📧 Alertes Email
 
 Configuration SMTP dans `.env` :
+
 ```env
 ALERT_ENABLED=true
 SMTP_SERVER=smtp.gmail.com
